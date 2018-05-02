@@ -67,6 +67,5 @@
             android:fontFamily="@font/poppins"
             android:gravity="center"
             android:textSize="16dp"/>
-
     </LinearLayout>
 </ScrollView>

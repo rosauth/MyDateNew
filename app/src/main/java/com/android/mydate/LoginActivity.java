@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                // Start the Signup activity
+                // Start the Sign Up activity
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
                 finish();
@@ -58,6 +58,10 @@ public class LoginActivity extends AppCompatActivity {
             onLoginFailed();
             return;
         }
+//        else {
+//            //check if match with database
+//            onLoginSuccess(); // temporary
+//        }
 
         _loginButton.setEnabled(false);
 
@@ -83,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                 }, 3000);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
@@ -105,8 +108,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
         // Testing Chat Layout
-//        Intent logged_in = new Intent(LoginActivity.this, ChatActivity.class);
-//        startActivity(logged_in);
+        Intent logged_in = new Intent(LoginActivity.this, ChatActivity.class);
+        startActivity(logged_in);
     }
 
     public void onLoginFailed() {

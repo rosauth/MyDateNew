@@ -1,7 +1,9 @@
 package com.android.mydate;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +19,8 @@ import butterknife.ButterKnife;
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
+    private DBHelper mHelper;
+
     @BindView(R.id.input_name) EditText _nameText;
     @BindView(R.id.input_address) EditText _addressText;
     @BindView(R.id.input_email) EditText _emailText;
@@ -31,6 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         ButterKnife.bind(this);
+        mHelper = new DBHelper(this);
 
         _signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +63,9 @@ public class SignupActivity extends AppCompatActivity {
             onSignupFailed();
             return;
         }
+        else {
+            insertData();
+        }
 
         _signupButton.setEnabled(false);
 
@@ -66,13 +74,6 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
-
-        String name = _nameText.getText().toString();
-        String address = _addressText.getText().toString();
-        String email = _emailText.getText().toString();
-        String mobile = _mobileText.getText().toString();
-        String password = _passwordText.getText().toString();
-        String reEnterPassword = _reEnterPasswordText.getText().toString();
 
         // TODO: Implement your own signup logic here.
 
@@ -88,11 +89,35 @@ public class SignupActivity extends AppCompatActivity {
                 }, 3000);
     }
 
+    public void insertData(){
+        String name = _nameText.getText().toString();
+        String address = _addressText.getText().toString();
+        String email = _emailText.getText().toString();
+        String mobile = _mobileText.getText().toString();
+        String password = _passwordText.getText().toString();
+        String reEnterPassword = _reEnterPasswordText.getText().toString();
+
+        // insert to database
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DBContract.UserEntry.COL_NAME, name);
+        values.put(DBContract.UserEntry.COL_EMAIL, email);
+        values.put(DBContract.UserEntry.COL_ADDR, address);
+        values.put(DBContract.UserEntry.COL_NUM, mobile);
+        values.put(DBContract.UserEntry.COL_PWD, password);
+        db.insertWithOnConflict(DBContract.UserEntry.TABLE_USER, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+    }
+
 
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
-        finish();
+
+        Toast.makeText(getBaseContext(), "You are now registered", Toast.LENGTH_LONG).show();
+
+        Intent signed_up = new Intent(SignupActivity.this, LoginActivity.class);
+        startActivity(signed_up);
     }
 
     public void onSignupFailed() {
@@ -132,13 +157,13 @@ public class SignupActivity extends AppCompatActivity {
 
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
+            _emailText.setError("Enter a valid email address");
             valid = false;
         } else {
             _emailText.setError(null);
         }
 
-        if (mobile.isEmpty() || mobile.length()!=10) {
+        if (mobile.isEmpty() || mobile.length()!=12) {
             _mobileText.setError("Enter Valid Mobile Number");
             valid = false;
         } else {
@@ -153,7 +178,7 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || reEnterPassword.length() > 10 || !(reEnterPassword.equals(password))) {
-            _reEnterPasswordText.setError("Password Do not match");
+            _reEnterPasswordText.setError("Password do not match");
             valid = false;
         } else {
             _reEnterPasswordText.setError(null);

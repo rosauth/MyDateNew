@@ -5,6 +5,8 @@
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true">
 
+    <!--Tambahin Interest dan About Me-->
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
